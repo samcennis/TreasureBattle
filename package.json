@@ -1,0 +1,17 @@
+{
+	"name": "TreasureBattle",
+	"version": "0.0.1",
+	"description": "Multiplayer competitive treasure hunt game",
+	"dependencies": {
+        "socket.io": "^1.3.6",
+        "util": "^0.10.3"
+	},
+	"repository": {
+        "type": "git",
+        "url":  "https://github.com/samcennis/treasurehunt.git"
+    },
+    "author": "TBD - SE 329 Group",
+	"engines": {
+		"node": "0.12.x"
+	} 
+}
