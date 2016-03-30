@@ -1,31 +1,41 @@
 <!DOCTYPE html>
+<html>
 
-<html lang="en">
+<head>
+  <title>Treasure Hunt</title>
+  <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
+  <link rel="stylesheet" href="style.css" />
+  <script src="socket.io/socket.io.js"></script>
+  <script src="client.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
 
-	<head>
-		<title>A multiplayer game built using HTML5 canvas and WebSockets</title>
-		<meta charset="utf-8">
-		
-		<link rel="stylesheet" href="style/reset.css">
-		<link rel="stylesheet" href="style/game.css">
-	</head>
-	
-	<body>
-		<canvas id="gameCanvas"></canvas>
-        
-        <script src="http://localhost:8000/socket.io/socket.io.js"></script>
-        <script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
-		<script src="js/requestAnimationFrame.js"></script>
-		<script src="js/Keys.js"></script>
-		<script src="js/Player.js"></script>
-		<script src="js/game.js"></script>
-		<script>        
-			// Initialize the game
-			$(function() {
-                console.log("Ready!");
-                init();
-                animate();    
-            });
-		</script>
-	</body>
+<body class="grey lighten-2">
+  <h1>Treasure Hunt</h2>
+  <h4 id="instructions">Click on the Defensive Map to place your tokens and click the button at the bottom when finished</h4>
+  <h3 id="whosTurn"></h3>
+  <br>
+  <br>
+  <div class="container white">
+    <div id="map1" class="section row">
+      <h3 class="center">Offensive Map</h3>
+      <div class="col s12">
+        <div id="offenseMap" style="height: 400px;"></div>
+      </div>
+    </div>
+    <div id="map2" class="section row">
+      <h3 class="center">Defensive Map</h3>
+      <div class="col s12">
+        <div id="defenseMap" style="height: 400px;"></div>
+      </div>
+    </div>
+    <br>
+    <br>
+    <button id="ready_btn" onClick="save()">Ready</button>
+  </div>
+
+  <script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
+  <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+</body>
+
 </html>
