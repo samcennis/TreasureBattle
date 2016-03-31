@@ -69,7 +69,8 @@ document.addEventListener("DOMContentLoaded", function () {
   function save() {
     console.log("ready click");
     if(placedTokens < tokenNumber) {
-      alert('You need to place ' + tokenNumber + ' Tokens on the bottom map!')
+      alert('You need to place ' + tokenNumber
+            + ' Tokens on the bottom map!')
     }
     else {
       socket.emit('ready', {id: playerId, coordinates:mycoordinates });  
