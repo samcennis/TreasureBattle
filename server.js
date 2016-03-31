@@ -22,7 +22,7 @@ var count = 0;
 var ready = 0;
 var turn = 0;
 var players = [];
- 
+
 
 // event-handler for new incoming connections
 var setEventHandlers = function() {
@@ -32,15 +32,15 @@ var setEventHandlers = function() {
 
 // New socket connection
 function onSocketConnection(socket) {
-  
+
   console.log("on connection");
-  
+
     socket.on('joinReq', joinRequest);
-  
+
     socket.on('ready', playerReady);
 
     socket.on('guess', guess);
-   
+
 }
 
 function joinRequest(data) {
@@ -61,17 +61,21 @@ function joinRequest(data) {
     });
   }
 }
-  
+
 function playerReady(data){
-  console.log("player ready " + data.coordinates.length);
-  for(i=0; i < data.coordinates.length; i++){
-    var token = new Token(data.coordinates[i].lat, data.coordinates[i].lng);
-    players[data.id].addToken(token);
-  }
-  ready++;
-  if(ready == numOfPlayers){
-    this.broadcast.emit('turn', {turn: 0});
-    this.emit('turn', {turn: 0});
+  if (data.id < numOfPlayers) {
+    console.log("Player " + data.id + " ready! " + data.coordinates.length + " tokens hidden");
+    for(i=0; i < data.coordinates.length; i++){
+      var token = new Token(data.coordinates[i].lat, data.coordinates[i].lng);
+      players[data.id].addToken(token);
+    }
+    ready++;
+    if(ready == numOfPlayers){
+      this.broadcast.emit('turn', {turn: 0});
+      this.emit('turn', {turn: 0});
+    }
+  } else {
+    console.log("Invalid player with ID: " + data.id + " tried to click ready button");
   }
 }
 
