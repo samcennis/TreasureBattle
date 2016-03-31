@@ -68,7 +68,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function save() {
     console.log("ready click");
-    socket.emit('ready', {id: playerId, coordinates:mycoordinates });
+    if(placedTokens < tokenNumber) {
+      alert('You need to place ' + tokenNumber + ' Tokens on the bottom map!')
+    }
+    else {
+      socket.emit('ready', {id: playerId, coordinates:mycoordinates });  
+    }
   }
 
   // draw line received from server
@@ -131,24 +136,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     myguesses.push(m);
   });
-
-  // main loop, running every 25ms
-//  function mainLoop() {
-//    // check if the user is drawing
-//    if (mouse.click && mouse.move && mouse.pos_prev) {
-//      // send line to to the server
-//      socket.emit('draw_line', {
-//        line: [mouse.pos, mouse.pos_prev]
-//      });
-//      mouse.move = false;
-//    }
-//    mouse.pos_prev = {
-//      x: mouse.pos.x
-//      , y: mouse.pos.y
-//    };
-//    setTimeout(mainLoop, 25);
-//  }
-//  mainLoop();
 
 
   //request to join game
