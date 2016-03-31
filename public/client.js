@@ -3,9 +3,17 @@ document.addEventListener("DOMContentLoaded", function () {
   var socket = io.connect();
 
   var offenseMap = L.map('offenseMap').setView([38, -100], 4);
-
+  offenseMap.dragging.disable();
+offenseMap.touchZoom.disable();
+offenseMap.doubleClickZoom.disable();
+offenseMap.scrollWheelZoom.disable();
+offenseMap.keyboard.disable();
   var defenseMap = L.map('defenseMap').setView([38, -100], 4);
-
+  defenseMap.dragging.disable();
+  defenseMap.touchZoom.disable();
+  defenseMap.doubleClickZoom.disable();
+  defenseMap.scrollWheelZoom.disable();
+  defenseMap.keyboard.disable();
   L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1Ijoic2VubmlzIiwiYSI6ImNpbTUwbmZ2ZjAxZzZ0a20zM3lpZzdtMWsifQ.4gt6lV5KwYEyzRXItJxHHQ', {
     attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>'
     , maxZoom: 18
@@ -34,7 +42,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (playerId < maxPlayers) {
       if ((turn < 0) && (placedTokens < tokenNumber)) {
   //      alert("Lat, Lon : " + e.latlng.lat + ", " + e.latlng.lng);
-        var m = L.marker(e.latlng, {
+        var m = L.marker(e.latlng, {draggable:true}, {
             icon: L.icon({
               iconUrl: 'marker-yellow.png',
               iconSize:     [25, 41], // size of the icon
@@ -73,7 +81,12 @@ document.addEventListener("DOMContentLoaded", function () {
             + ' Tokens on the bottom map!')
     }
     else {
-      socket.emit('ready', {id: playerId, coordinates:mycoordinates });  
+      var i = 0;
+      while(i < mymarkers.length){
+        mymarkers[i].dragging.disable();
+        i++;
+      }
+      socket.emit('ready', {id: playerId, coordinates:mycoordinates });
     }
   }
 
