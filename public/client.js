@@ -24,6 +24,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   var maxPlayers = 2;
   var tokenNumber = -1;
+  var placedTokens = 0;
   var playerId = -1;
   var mapScope = -1;
 
@@ -31,7 +32,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   defenseMap.on('click', function (e) {
     if (playerId < maxPlayers) {
-      if (turn < 0) {
+      if ((turn < 0) && (placedTokens < tokenNumber)) {
   //      alert("Lat, Lon : " + e.latlng.lat + ", " + e.latlng.lng);
         var m = L.marker(e.latlng, {
             icon: L.icon({
@@ -43,6 +44,7 @@ document.addEventListener("DOMContentLoaded", function () {
         m.addTo(defenseMap);
         mymarkers.push(m);
         mycoordinates.push(e.latlng);
+        placedTokens++;
       }
     } else {
       console.log("Can't place token! You are not a member of this game...");
@@ -54,6 +56,8 @@ document.addEventListener("DOMContentLoaded", function () {
         console.log("guessing");
   //      alert("Lat, Lon : " + e.latlng.lat + ", " + e.latlng.lng);
         socket.emit('guess', {id: playerId, latlng: e.latlng});
+      } else {
+        console.log("Not your turn. Back off!")
       }
     } else {
       console.log("Can't place guess! You are not a member of this game...");
@@ -96,7 +100,7 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   socket.on('guessed', function (data) {
-    console.log("guess " + data.player + " " + playerId + " " + data.distance);
+    console.log("guess by " + data.player + " " + data.distance + " miles from your closest token");
     var m;
     if(data.hit){
       m = L.marker(data.latlng, {
@@ -113,9 +117,17 @@ document.addEventListener("DOMContentLoaded", function () {
     m.bindPopup("<b>Closest Token:</b><br>" + data.distance + " mi.")
     if(data.player == playerId){
        m.addTo(offenseMap);
+       if (data.game_status) {
+         document.getElementById("gameEnd").innerHTML = "YOU WIN!!!";
+         document.getElementById("whosTurn").innerHTML = "";
+       }
     }
     else{
       m.addTo(defenseMap);
+      if (data.game_status) {
+        document.getElementById("gameFull").innerHTML = "YOU LOSE...";
+        document.getElementById("whosTurn").innerHTML = "";
+      }
     }
     myguesses.push(m);
   });

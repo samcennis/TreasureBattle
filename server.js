@@ -80,24 +80,25 @@ function playerReady(data){
 }
 
 function guess(data){
-  console.log("guess " + data.id + " " + turn);
+  console.log("guess by player " + data.id);
   var shortest = 99999999.99;
   var inRange = false;
+  var win = false;
   var curr = 0;
   //loop through players other than the one guessing
   for(i=0; i < players.length; i++){
     if(i != data.id){ //look at other players tokens
       curr = i;
-      console.log("i: " + i + " " + curr);
+      // console.log("i: " + i + " " + curr);
       var dists = players[i].getDistances(data.latlng.lat, data.latlng.lng);
       console.log(dists);
-      console.log("i: " + i + " " + curr);
+      // console.log("i: " + i + " " + curr);
       for(j=0; j < dists.length; j++){
-        console.log("i: " + i);
+        // console.log("i: " + i);
         //check if close enough for a find
         if(dists[j] < accuracyRange){
           //i player's token has been found
-          console.log("i: " + i + " " + data.id);
+          console.log("You found a token!!!");
           players[curr].lostToken(j);
           players[data.id].incFound();
           inRange = true;
@@ -106,14 +107,18 @@ function guess(data){
         if(dists[j] < shortest){
           shortest = dists[j];
         }
+        if (players[data.id].getFound() == tokensPerPlayer) {win = true;}
       }
     }
   }
-  this.broadcast.emit('guessed', {player: data.id, hit: inRange, latlng: data.latlng, distance: shortest});
-  this.emit('guessed', {player: data.id, hit: inRange, latlng: data.latlng, distance: shortest});
-  turn++;
-  this.broadcast.emit('turn', {turn: turn % numOfPlayers});
-  this.emit('turn', {turn: turn % numOfPlayers});
+  this.broadcast.emit('guessed', {player: data.id, hit: inRange, latlng: data.latlng, distance: shortest, game_status: win});
+  this.emit('guessed', {player: data.id, hit: inRange, latlng: data.latlng, distance: shortest, game_status: win});
+  console.log(win);
+  if (!win) {
+    turn++;
+    this.broadcast.emit('turn', {turn: turn % numOfPlayers});
+    this.emit('turn', {turn: turn % numOfPlayers});
+  }
 }
 
 setEventHandlers();
