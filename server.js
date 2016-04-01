@@ -15,8 +15,14 @@ console.log("Server running on 127.0.0.1:8080");
 
 var numOfPlayers = 2;
 var tokensPerPlayer = 3;
-var accuracyRange = 100;
-var minZoom = 100;
+var selectedMap = "USA";
+
+if (selectedMap == "USA") {
+  var accuracyRange = 100;
+} else if (selectedMap == "Ames") {
+  var accuracyRange = 1;
+}
+
 
 var count = 0;
 var ready = 0;
@@ -50,7 +56,7 @@ function joinRequest(data) {
       playing: true,
       id: count,
       tokenNum: tokensPerPlayer,
-      scope: minZoom
+      scope: 100
     });
     players.push(new Player(count));
     count += 1;

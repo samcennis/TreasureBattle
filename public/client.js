@@ -2,30 +2,49 @@ document.addEventListener("DOMContentLoaded", function () {
 
   var socket = io.connect();
 
+  // Map setting
+  var usaNElat = 50;
+  var usaNElng = -66;
+  var usaSWlat = 26;
+  var usaSWlng = -124;
+  var usaMinZoom = 4;
+  var usaMaxZoom = 12;
+
+  var amesNElat = 42.07;
+  var amesNElng = -93.40;
+  var amesSWlat = 41.97;
+  var amesSWlng = -93.83;
+  var amesMinZoom = 12;
+  var amesMaxZoom = 18;
+
+
   var offenseMap = L.map('offenseMap').setView([38, -100], 4);
-  offenseMap.dragging.disable();
-offenseMap.touchZoom.disable();
-offenseMap.doubleClickZoom.disable();
-offenseMap.scrollWheelZoom.disable();
-offenseMap.keyboard.disable();
+
   var defenseMap = L.map('defenseMap').setView([38, -100], 4);
-  defenseMap.dragging.disable();
-  defenseMap.touchZoom.disable();
-  defenseMap.doubleClickZoom.disable();
-  defenseMap.scrollWheelZoom.disable();
-  defenseMap.keyboard.disable();
+
   L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1Ijoic2VubmlzIiwiYSI6ImNpbTUwbmZ2ZjAxZzZ0a20zM3lpZzdtMWsifQ.4gt6lV5KwYEyzRXItJxHHQ', {
     attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>'
-    , maxZoom: 18
+    , maxZoom: usaMaxZoom
+    , minZoom: usaMinZoom
     , id: 'mapbox.streets'
   , }).addTo(offenseMap);
 
   L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1Ijoic2VubmlzIiwiYSI6ImNpbTUwbmZ2ZjAxZzZ0a20zM3lpZzdtMWsifQ.4gt6lV5KwYEyzRXItJxHHQ', {
     attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>'
-    , maxZoom: 18
+    , maxZoom: usaMaxZoom
+    , minZoom: usaMinZoom
     , id: 'mapbox.streets'
   , }).addTo(defenseMap);
 
+  offenseMap.setMaxBounds([
+    [usaNElat, usaNElng],
+    [usaSWlat, usaSWlng]
+  ]);
+
+  defenseMap.setMaxBounds([
+    [usaNElat, usaNElng],
+    [usaSWlat, usaSWlng]
+  ]);
   var mymarkers = [];
   var mycoordinates = [];
   var myguesses = [];
@@ -60,19 +79,14 @@ offenseMap.keyboard.disable();
         m.on('dragend', function(event){
             var m = event.target;
             var position = m.getLatLng();
-            alert(position);
             m.setLatLng([position.lat,position.lng],{draggable:'true'}).bindPopup(position).update();
             mymarkers.pop();
             mymarkers.push(m);
             mycoordinates.push(m.getLatLng());
-            alert(mymarkers);
-            alert(mycoordinates);
             m.addTo(defenseMap);
           });
         mymarkers.push(m);
-        alert(mymarkers);
         mycoordinates.push(m.getLatLng());
-        alert(mycoordinates);
         placedTokens++;
       }
     } else {
