@@ -51,8 +51,28 @@ offenseMap.keyboard.disable();
           });
         m.addTo(defenseMap);
         m.dragging.enable();
+        m.on('dragstart', function(event){
+          var m = event.target;
+          var position = m.getLatLng();
+          var index = mycoordinates.indexOf(position);
+          mycoordinates.splice(index, 1);
+        });
+        m.on('dragend', function(event){
+            var m = event.target;
+            var position = m.getLatLng();
+            alert(position);
+            m.setLatLng([position.lat,position.lng],{draggable:'true'}).bindPopup(position).update();
+            mymarkers.pop();
+            mymarkers.push(m);
+            mycoordinates.push(m.getLatLng());
+            alert(mymarkers);
+            alert(mycoordinates);
+            m.addTo(defenseMap);
+          });
         mymarkers.push(m);
-        mycoordinates.push(e.latlng);
+        alert(mymarkers);
+        mycoordinates.push(m.getLatLng());
+        alert(mycoordinates);
         placedTokens++;
       }
     } else {
