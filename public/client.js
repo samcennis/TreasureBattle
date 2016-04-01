@@ -40,9 +40,9 @@ offenseMap.keyboard.disable();
 
   defenseMap.on('click', function (e) {
     if (playerId < maxPlayers) {
-      if ((turn < 0) && (placedTokens < tokenNumber)) {
+      if ((turn == -1) && (placedTokens < tokenNumber)) {
   //      alert("Lat, Lon : " + e.latlng.lat + ", " + e.latlng.lng);
-        var m = L.marker(e.latlng, {draggable:true}, {
+        var m = L.marker(e.latlng, {
             icon: L.icon({
               iconUrl: 'marker-yellow.png',
               iconSize:     [25, 41], // size of the icon
@@ -50,6 +50,7 @@ offenseMap.keyboard.disable();
             })
           });
         m.addTo(defenseMap);
+        m.dragging.enable();
         mymarkers.push(m);
         mycoordinates.push(e.latlng);
         placedTokens++;
@@ -137,6 +138,8 @@ offenseMap.keyboard.disable();
     if(data.player == playerId){
        m.addTo(offenseMap);
        if (data.game_status) {
+         // Set turn so that you can't place any more markers on either map
+         turn = -2;
          document.getElementById("gameEnd").innerHTML = "YOU WIN!!!";
          document.getElementById("whosTurn").innerHTML = "";
        }
