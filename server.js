@@ -3,6 +3,7 @@ var express = require('express')
   , http = require('http')
   , socketIo = require('socket.io')
   , Player = require('./Player').Player
+  , Game = require('./Game').Game
   , Token = require('./Token').Token;
 
 // start webserver on port 8080
@@ -13,27 +14,29 @@ server.listen(8080);
 app.use(express.static(__dirname + '/public'));
 console.log("Server running on 127.0.0.1:8080");
 
-var numOfPlayers = 2;
-var tokensPerPlayer = 3;
-var selectedMap = "USA";
+var gameCount = 0;
+var gameLimit = 10;
+var games = [];
 
-if (selectedMap == "USA") {
-  var accuracyRange = 100;
-} else if (selectedMap == "Ames") {
-  var accuracyRange = 1;
-}
-
-
-var count = 0;
-var ready = 0;
-var turn = 0;
-var players = [];
+//REST API
+app.get('/options', function (req, res) {
+  console.log("getting options");
+  var options = [];
+  for (name in games) {
+    
+    options.push({
+      name: name
+      , number: games[name].getNumPlayers() - games[name].getCount()
+    })
+  }
+  res.json(options)
+});
 
 
 // event-handler for new incoming connections
-var setEventHandlers = function() {
+var setEventHandlers = function () {
   console.log("setEventHandlers");
-	io.on("connection", onSocketConnection);
+  io.on("connection", onSocketConnection);
 };
 
 // New socket connection
@@ -41,89 +44,173 @@ function onSocketConnection(socket) {
 
   console.log("on connection");
 
-    socket.on('joinReq', joinRequest);
+  socket.on('createGame', createGame);
 
-    socket.on('ready', playerReady);
+  socket.on('joinReq', joinRequest);
 
-    socket.on('guess', guess);
+  socket.on('ready', playerReady);
+
+  socket.on('guess', guess);
 
 }
 
-function joinRequest(data) {
-  console.log("join request " + count);
-  if (count < numOfPlayers) {
-    this.emit('joinReq', {
-      playing: true,
-      id: count,
-      tokenNum: tokensPerPlayer,
-      scope: 100
-    });
-    players.push(new Player(count));
-    count += 1;
+function createGame(data) {
+  console.log("create game " + data.info.createName);
+  
+  var isCreated = false;
+  
+  if (gameCount <= gameLimit) {
+    
+    var newGame = new Game(data.info.createName, data.info.numberOfPlayers, data.info.numberOfTokens, data.info.percision, data.map);
+    
+    newGame.addPlayer(new Player(0));
+    
+    games[data.info.createName] = newGame;
+    
+    isCreated = true;
+  } else {
+    console.log("Failed, reached game limit");
   }
-  else{
+  
+  this.emit('joinReq', {
+    status: isCreated
+  });
+}
+
+function joinRequest(data) {
+  console.log("join request " + data.name);
+
+  game = games[data.name];
+
+  if (game != undefined && game.isFull() == false) {
+    this.emit('joinReq', {
+      playing: true
+      , id: game.getCount()
+      , tokenNum: game.getNumOfTokens()
+      , playerNum: game.getNumPlayers()
+      , map: game.getMap()
+    });
+    game.addPlayer(new Player(game.getCount));
+  } else {
     this.emit('joinReq', {
       playing: false
     });
   }
 }
 
-function playerReady(data){
-  if (data.id < numOfPlayers) {
+function playerReady(data) {
+  game = games[data.name];
+
+  //check if valid game name
+  if (game == undefined) {
+    console.log("Invalid game name: " + data.name + " in playerReady");
+  }
+
+  if (data.id < game.getNumPlayers()) {
     console.log("Player " + data.id + " ready! " + data.coordinates.length + " tokens hidden");
-    for(i=0; i < data.coordinates.length; i++){
+    for (i = 0; i < data.coordinates.length; i++) {
       var token = new Token(data.coordinates[i].lat, data.coordinates[i].lng);
-      players[data.id].addToken(token);
+      game.players[data.id].addToken(token);
     }
-    ready++;
-    if(ready == numOfPlayers){
-      this.broadcast.emit('turn', {turn: 0});
-      this.emit('turn', {turn: 0});
+    waitingOn = game.incReady();
+    if (waitingOn == 0) {
+      this.broadcast.emit('turn', {
+        name: data.name
+        , turn: 0
+      });
+      this.emit('turn', {
+        name: data.name
+        , turn: 0
+      });
     }
+    this.broadcast.emit('waiting', {
+      name: data.name
+      , num: waitingOn
+      , player: data.id
+    });
+    this.emit('waiting', {
+      name: data.name
+      , num: waitingOn
+      , player: data.id
+    });
   } else {
     console.log("Invalid player with ID: " + data.id + " tried to click ready button");
   }
 }
 
-function guess(data){
-  console.log("guess by player " + data.id);
-  var shortest = 99999999.99;
+function guess(data) {
+  game = games[data.name];
+
+  //check if valid game name
+  if (game == undefined) {
+    console.log("Invalid game name: " + data.name + " in guess");
+    return;
+  }
+  console.log(data.name + ": guess by player " + data.id);
+
+  var shortest = 99999.99; // Earth circumference 24901 mi
   var inRange = false;
   var win = false;
   var curr = 0;
   //loop through players other than the one guessing
-  for(i=0; i < players.length; i++){
-    if(i != data.id){ //look at other players tokens
+  for (i = 0; i < game.getNumPlayers(); i++) {
+    if (i != data.id) { //look at other players tokens
       curr = i;
       // console.log("i: " + i + " " + curr);
-      var dists = players[i].getDistances(data.latlng.lat, data.latlng.lng);
+      var dists = game.players[i].getDistances(data.latlng.lat, data.latlng.lng);
       console.log(dists);
       // console.log("i: " + i + " " + curr);
-      for(j=0; j < dists.length; j++){
+      for (j = 0; j < dists.length; j++) {
         // console.log("i: " + i);
         //check if close enough for a find
-        if(dists[j] < accuracyRange){
+        if (dists[j] <= game.getPrecision()) {
           //i player's token has been found
           console.log("You found a token!!!");
-          players[curr].lostToken(j);
-          players[data.id].incFound();
+          game.players[curr].lostToken(j);
+          game.players[data.id].incFound();
           inRange = true;
         }
         //check if shortest distance
-        if(dists[j] < shortest){
+        if (dists[j] < shortest) {
           shortest = dists[j];
         }
-        if (players[data.id].getFound() == tokensPerPlayer) {win = true;}
+        if (game.players[data.id].getFound() == game.getNumOfTokens()) {
+          win = true;
+        }
       }
     }
   }
-  this.broadcast.emit('guessed', {player: data.id, hit: inRange, latlng: data.latlng, distance: shortest, game_status: win});
-  this.emit('guessed', {player: data.id, hit: inRange, latlng: data.latlng, distance: shortest, game_status: win});
+  this.broadcast.emit('guessed', {
+    name: data.name
+    , player: data.id
+    , hit: inRange
+    , latlng: data.latlng
+    , distance: shortest
+    , game_status: win
+  });
+  this.emit('guessed', {
+    name: data.name
+    , player: data.id
+    , hit: inRange
+    , latlng: data.latlng
+    , distance: shortest
+    , game_status: win
+  });
   console.log(win);
   if (!win) {
-    turn++;
-    this.broadcast.emit('turn', {turn: turn % numOfPlayers});
-    this.emit('turn', {turn: turn % numOfPlayers});
+    game.nextTurn();
+    this.broadcast.emit('turn', {
+      name: data.name
+      , turn: game.getTurn()
+    });
+    this.emit('turn', {
+      name: data.name
+      , turn: game.getTurn()
+    });
+  } else {
+    //if win condition reached, remove game from list
+    delete games[data.game]
+    gameCount--;
   }
 }
 
