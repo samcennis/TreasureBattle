@@ -90,7 +90,7 @@ function joinRequest(data) {
       , playerNum: game.getNumPlayers()
       , map: game.getMap()
     });
-    game.addPlayer(new Player(game.getCount));
+    game.addPlayer(new Player(game.getCount()));
   } else {
     this.emit('joinReq', {
       playing: false
