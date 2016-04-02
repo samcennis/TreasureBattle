@@ -15,7 +15,7 @@ angular.module('myApp')
 
     var mymarkers = [];
     var mycoordinates = [];
-    var myguesses = [];
+    $scope.stats = [];
     var gameName = "";
 
     var placedTokens = 0;
@@ -40,7 +40,7 @@ angular.module('myApp')
         , map: mapInfo
       });
 
-      setUpMap();
+      setupMap();
 
     } else {
       gameName = gameData.getJoinName();
@@ -149,7 +149,7 @@ angular.module('myApp')
         gameInfo.numberOfPlayers = data.playerNum;
         mapInfo = data.map;
         console.log(data);
-        setUpMap();
+        setupMap();
       } else {
         playerId = -1;
         document.getElementById("gameFull").innerHTML = "This Game Is Full!";
@@ -214,11 +214,14 @@ angular.module('myApp')
             document.getElementById("whosTurn").innerHTML = "";
           }
         }
-        myguesses.push(m);
+        console.log(data.stats);
+        $scope.stats = data.stats;
+        $scope.$apply();
       }
     });
+    
 
-    function setUpMap() {
+    function setupMap() {
       
       console.log(mapInfo);
       

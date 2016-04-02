@@ -21,6 +21,10 @@ var Player = function (playerId) {
   var getGuesses = function() {
 		return guesses;
 	};
+  
+  var incGuesses = function() {
+		guesses++;
+	};
 
   var getDistances = function (otherLat, otherLng) {
     var arr = [];
@@ -44,6 +48,10 @@ var Player = function (playerId) {
   var addToken = function (token) {
     tokens.push(token);
   };
+  
+  var getStats = function () {
+    return {id: id, found: found, lost: lost, guesses: guesses};
+  };
 
 
   // Define which variables and methods can be accessed
@@ -55,6 +63,8 @@ var Player = function (playerId) {
     , incFound: incFound
     , addToken: addToken
     , lostToken: lostToken
+    , getStats: getStats
+    , incGuesses: incGuesses
   }
 };
 

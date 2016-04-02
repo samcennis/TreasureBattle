@@ -150,18 +150,20 @@ function guess(data) {
 
   var shortest = 99999.99; // Earth circumference 24901 mi
   var inRange = false;
+  var stats = [];
   var win = false;
   var curr = 0;
+  
+  game.players[data.id].incGuesses();
+  
   //loop through players other than the one guessing
   for (i = 0; i < game.getNumPlayers(); i++) {
     if (i != data.id) { //look at other players tokens
+      //somehow the value of i gets changed befor the next iteration, so to keep its value i assign it to a temp variable
       curr = i;
-      // console.log("i: " + i + " " + curr);
       var dists = game.players[i].getDistances(data.latlng.lat, data.latlng.lng);
       console.log(dists);
-      // console.log("i: " + i + " " + curr);
       for (j = 0; j < dists.length; j++) {
-        // console.log("i: " + i);
         //check if close enough for a find
         if (dists[j] <= game.getPrecision()) {
           //i player's token has been found
@@ -180,12 +182,17 @@ function guess(data) {
       }
     }
   }
+  //collect stats for scoreboard
+  for (i = 0; i < game.getNumPlayers(); i++){
+    stats.push(game.players[i].getStats());
+  }
   this.broadcast.emit('guessed', {
     name: data.name
     , player: data.id
     , hit: inRange
     , latlng: data.latlng
     , distance: shortest
+    , stats: stats
     , game_status: win
   });
   this.emit('guessed', {
@@ -194,9 +201,9 @@ function guess(data) {
     , hit: inRange
     , latlng: data.latlng
     , distance: shortest
+    , stats: stats
     , game_status: win
   });
-  console.log(win);
   if (!win) {
     game.nextTurn();
     this.broadcast.emit('turn', {

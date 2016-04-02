@@ -1,6 +1,7 @@
 <div id="wrap" class="container">
 
-  <h4 id="instructions"><b>Instructions:</b> Click on the Defensive Map to place your tokens and click the button at the bottom when finished</h4>
+  <h4><b>Instructions:</b></h4>
+  <h4 id="instructions">Click on the Defensive Map to place your tokens and click the button at the bottom when finished</h4>
   <h3 id="whosTurn" align="center" style="color:green"></h3>
   <h3 id="gameEnd" align="center" style="color:blue"></h3>
   <h3 id="gameFull" align="center" style="color:red"></h3>
@@ -19,6 +20,27 @@
     <br>
     <button id="ready_btn" class="btn btn-primary" ng-hide="status.waiting" onClick="save()">Ready</button>
     <p ng-show="status.waiting && status.waitingOn > 0">Waiting on: {{status.waitingOn}} player(s)</p>
+    <div ng-show="status.waitingOn == 0" class="" align="center">
+      <h3>Scoreboard</h3>
+      <table class="table table-striped table-bordered">
+        <thead>
+          <tr>
+            <th>Player</th>
+            <th>Found</th>
+            <th>Lost</th>
+            <th>Guesses</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="player in stats">
+            <td>player{{player.id}}</td>
+            <td>{{player.found}}</td>
+            <td>{{player.lost}}</td>
+            <td>{{player.guesses}}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 
 </div>
