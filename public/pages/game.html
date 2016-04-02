@@ -1,0 +1,24 @@
+<div id="wrap" class="container">
+
+  <h4 id="instructions"><b>Instructions:</b> Click on the Defensive Map to place your tokens and click the button at the bottom when finished</h4>
+  <h3 id="whosTurn" align="center" style="color:green"></h3>
+  <h3 id="gameEnd" align="center" style="color:blue"></h3>
+  <h3 id="gameFull" align="center" style="color:red"></h3>
+  <div class="container">
+    <div class="row">
+      <div id="map2" class="col-sm-12 col-md-12 col-lg-6">
+        <h3 class="">Defensive Map</h3>
+        <div id="defenseMap" ng-class="{'active' : !yourturn}" style="height: 400px;"></div>
+      </div>
+      <div id="map1" class="col-sm-12 col-md-12 col-lg-6">
+        <h3 class="">Offensive Map</h3>
+        <div id="offenseMap" ng-class="{'active' : yourturn}" style="height: 400px;"></div>
+      </div>
+    </div>
+    <br>
+    <br>
+    <button id="ready_btn" class="btn btn-primary" ng-hide="status.waiting" onClick="save()">Ready</button>
+    <p ng-show="status.waiting && status.waitingOn > 0">Waiting on: {{status.waitingOn}} player(s)</p>
+  </div>
+
+</div>
