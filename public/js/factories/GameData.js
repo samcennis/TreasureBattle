@@ -6,6 +6,8 @@ angular.module('myApp')
   
   var joinName = "";
   
+  var created = false;
+  
   var info = {
       createName: ""
       , numberOfTokens: 3
@@ -15,6 +17,7 @@ angular.module('myApp')
   };
 
   service.setInfo = function (data) {
+    isCreated = true;
     info = data;
   }
   
@@ -28,6 +31,10 @@ angular.module('myApp')
   
   service.getJoinName = function () {
     return joinName;
+  }
+  
+  service.isCreated = function () {
+    return created;
   }
   
   service.resetInfo = function () {

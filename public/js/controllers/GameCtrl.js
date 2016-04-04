@@ -1,6 +1,6 @@
 angular.module('myApp')
 
-.controller('GameCtrl', function ($scope, gameData, mapData) {
+.controller('GameCtrl', function ($scope, $location, gameData, mapData) {
 
   angular.element(document).ready(function () {
     var socket = io.connect();
@@ -28,8 +28,12 @@ angular.module('myApp')
     $scope.precision = 100;
 
     var turn = -1; //-1-set markers, otherwise matches playerId's turn
-
-    if (gameData.getJoinName() == "") {
+    
+    //if game wasn't created or joined go to game menu
+    if(gameData.getJoinName() == "" && !gameData.isCreated()){
+      $location.path( '/' );
+    }
+    else if (gameData.isCreated()) {
       gameInfo = gameData.getInfo();
       if (gameInfo.map == "USA") {
         mapInfo = mapData.getUSA();
