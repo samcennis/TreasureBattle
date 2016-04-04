@@ -61,7 +61,7 @@ function createGame(data) {
   
   if (gameCount <= gameLimit) {
     
-    var newGame = new Game(data.info.createName, data.info.numberOfPlayers, data.info.numberOfTokens, data.info.percision, data.map);
+    var newGame = new Game(data.info.createName, data.info.numberOfPlayers, data.info.numberOfTokens, data.info.precision, data.map);
     
     newGame.addPlayer(new Player(0));
     
@@ -81,13 +81,14 @@ function joinRequest(data) {
   console.log("join request " + data.name);
 
   game = games[data.name];
-
+    
   if (game != undefined && game.isFull() == false) {
     this.emit('joinReq', {
       playing: true
       , id: game.getCount()
       , tokenNum: game.getNumOfTokens()
       , playerNum: game.getNumPlayers()
+      , precision: game.getPrecision()
       , map: game.getMap()
     });
     game.addPlayer(new Player(game.getCount()));
@@ -108,7 +109,7 @@ function playerReady(data) {
 
   if (data.id < game.getNumPlayers()) {
     console.log("Player " + data.id + " ready! " + data.coordinates.length + " tokens hidden");
-    for (i = 0; i < data.coordinates.length; i++) {
+    for (var i = 0; i < data.coordinates.length; i++) {
       var token = new Token(data.coordinates[i].lat, data.coordinates[i].lng);
       game.players[data.id].addToken(token);
     }
@@ -157,13 +158,13 @@ function guess(data) {
   game.players[data.id].incGuesses();
   
   //loop through players other than the one guessing
-  for (i = 0; i < game.getNumPlayers(); i++) {
+  for (var i = 0; i < game.getNumPlayers(); i++) {
     if (i != data.id) { //look at other players tokens
       //somehow the value of i gets changed befor the next iteration, so to keep its value i assign it to a temp variable
       curr = i;
       var dists = game.players[i].getDistances(data.latlng.lat, data.latlng.lng);
       console.log(dists);
-      for (j = 0; j < dists.length; j++) {
+      for (var j = 0; j < dists.length; j++) {
         //check if close enough for a find
         if (dists[j] <= game.getPrecision()) {
           //i player's token has been found
@@ -183,7 +184,7 @@ function guess(data) {
     }
   }
   //collect stats for scoreboard
-  for (i = 0; i < game.getNumPlayers(); i++){
+  for (var i = 0; i < game.getNumPlayers(); i++){
     stats.push(game.players[i].getStats());
   }
   this.broadcast.emit('guessed', {

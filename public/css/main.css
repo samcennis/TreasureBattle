@@ -8,14 +8,15 @@ For more info and more free Bootstrap 3 HTML themes, visit http://startbootstrap
 /* Global Styles */
 
 html, body {
+    font-family: 'Roboto', sans-serif;
     height: 100%;
 }
 
 .header {
 	padding: 20px 0;
-	background-color: dodgerblue;
-    text-align: center;
-  color: floralwhite;
+	background-color: #f44336;
+    text-align: left;
+    color: floralwhite;
   
 }
 
@@ -32,13 +33,37 @@ html, body {
 /* Set the fixed height of the footer here */
 footer {
   height: 40px;
-  background-color: dodgerblue;
+  background-color: #f44336;
   margin-top: 20px;
   padding-top: 10px;
     text-align: center;
     color: floralwhite;
+    
+    
+    position: absolute;
+    bottom: 0;
+    
+    width: 100%;
 }
 
+
+.bottom-bar {
+    background-color: #ef9a9a;
+   // color: floralwhite;
+}
+
+.leaflet-control-attribution {
+    display: none;   
+}
+
+.status {
+    font-weight: bold   
+}
+
+.instructions {
+    font-style: italic   
+}
+/*
 input[type=text] {
     padding:5px; 
     border:2px solid #ccc; 
@@ -48,16 +73,25 @@ input[type=text] {
 
 input[type=text]:focus {
     border-color:#333;
-}
+}*/
 
 button[type=submit] {
     padding:5px 15px; 
-    background:#ccc; 
+    //background:#ccc; 
     border:0 none;
     cursor:pointer;
     -webkit-border-radius: 5px;
     border-radius: 5px; 
 }
-.active {
-  outline: 2px solid blue;
+.active-offense {
+  outline: 4px solid red;
+}
+
+.active-defense {
+  outline: 4px solid blue;
+}
+
+.status-btn-right {
+    float: right!important;
+    margin-right: 30px;
 }

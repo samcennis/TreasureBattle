@@ -21,7 +21,11 @@ angular.module('myApp')
     var placedTokens = 0;
     var playerId = -1;
     $scope.status = {waiting : false, waitingOn : -1};
-    $scope.yourturn = false;
+    $scope.yourturn = -1;
+    $scope.won = -1;
+    $scope.gameFull = false;
+    $scope.ready = false;
+    $scope.precision = 100;
 
     var turn = -1; //-1-set markers, otherwise matches playerId's turn
 
@@ -40,6 +44,9 @@ angular.module('myApp')
         , map: mapInfo
       });
 
+        
+      $scope.precision = gameInfo.precision;
+        
       setupMap();
 
     } else {
@@ -58,7 +65,7 @@ angular.module('myApp')
           //      alert("Lat, Lon : " + e.latlng.lat + ", " + e.latlng.lng);
           var m = L.marker(e.latlng, {
             icon: L.icon({
-              iconUrl: 'marker-yellow.png'
+              iconUrl: 'img/marker-yellow.png'
               , iconSize: [25, 41], // size of the icon
               iconAnchor: [12, 40], // point of the icon which will correspond to marker's location
             })
@@ -90,6 +97,7 @@ angular.module('myApp')
         console.log("Can't place token! You are not a member of this game...");
       }
     });
+      
     offenseMap.on('click', function (e) {
       if (playerId < gameInfo.numberOfPlayers) {
         if (turn == playerId) {
@@ -107,6 +115,7 @@ angular.module('myApp')
         console.log("Can't place guess! You are not a member of this game...");
       }
     });
+      
 
     document.getElementById("ready_btn").onclick = function () {
       save()
@@ -127,6 +136,8 @@ angular.module('myApp')
           , coordinates: mycoordinates
           , name: gameName
         });
+          
+          $scope.ready = true;
       }
     }
 
@@ -146,15 +157,19 @@ angular.module('myApp')
         console.log("playing");
         playerId = data.id;
         gameInfo.numberOfTokens = data.tokenNum;
-        gameInfo.numberOfPlayers = data.playerNum;
+        gameInfo.numberOfPlayers = data.playerNum;       
+        gameInfo.precision = data.precision;
+        $scope.precision = data.precision;
         mapInfo = data.map;
         console.log(data);
         setupMap();
       } else {
         playerId = -1;
-        document.getElementById("gameFull").innerHTML = "This Game Is Full!";
+        $scope.gameFull = true;
         console.log("This game is already full!");
       }
+        
+      $scope.$apply();
     });
 
     socket.on('turn', function (data) {
@@ -162,11 +177,8 @@ angular.module('myApp')
         console.log("turn " + data.turn + " id " + playerId);
         turn = data.turn;
         if (turn == playerId) {
-          document.getElementById("instructions").innerHTML = "Click on the Offensive Map and try to locate the other players tokens";
-          document.getElementById("whosTurn").innerHTML = "Your Turn!";
           $scope.yourturn = true;
         } else {
-          document.getElementById("whosTurn").innerHTML = "Opponents Turn...";
           $scope.yourturn = false;
         }
         $scope.$apply();
@@ -190,28 +202,37 @@ angular.module('myApp')
         if (data.hit) {
           m = L.marker(data.latlng, {
             icon: L.icon({
-              iconUrl: 'marker-red.png'
+              iconUrl: 'img/marker-red.png'
               , iconSize: [25, 41], // size of the icon
               iconAnchor: [12, 40], // point of the icon which will correspond to marker's location
             })
           });
+        $.snackbar({content: "TOKEN FOUND!"});  
+            
         } else {
           m = L.marker(data.latlng);
+          $.snackbar({content: "Miss..."});  
         }
         m.bindPopup("<b>Closest Token:</b><br>" + Math.round(data.distance * 100) / 100 + " mi.")
+        m.on('mouseover', function(e) {
+           this.openPopup(); 
+        });
+        m.on('mouseout', function(e) {
+           this.closePopup(); 
+        });
+        
+        
         if (data.player == playerId) {
           m.addTo(offenseMap);
           if (data.game_status) {
             // Set turn so that you can't place any more markers on either map
             turn = -2;
-            document.getElementById("gameEnd").innerHTML = "YOU WIN!!!";
-            document.getElementById("whosTurn").innerHTML = "";
+            $scope.won = 1;
           }
         } else {
           m.addTo(defenseMap);
           if (data.game_status) {
-            document.getElementById("gameFull").innerHTML = "YOU LOSE...";
-            document.getElementById("whosTurn").innerHTML = "";
+            $scope.won = 0;
           }
         }
         console.log(data.stats);
@@ -221,20 +242,20 @@ angular.module('myApp')
     });
     
 
+     
+      
     function setupMap() {
       
       console.log(mapInfo);
       
       L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1Ijoic2VubmlzIiwiYSI6ImNpbTUwbmZ2ZjAxZzZ0a20zM3lpZzdtMWsifQ.4gt6lV5KwYEyzRXItJxHHQ', {
-        attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>'
-        , maxZoom: mapInfo.maxZoom
+        maxZoom: mapInfo.maxZoom
         , minZoom: mapInfo.minZoom
         , id: 'mapbox.streets'
       , }).addTo(offenseMap);
 
       L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1Ijoic2VubmlzIiwiYSI6ImNpbTUwbmZ2ZjAxZzZ0a20zM3lpZzdtMWsifQ.4gt6lV5KwYEyzRXItJxHHQ', {
-        attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>'
-        , maxZoom: mapInfo.maxZoom
+        maxZoom: mapInfo.maxZoom
         , minZoom: mapInfo.minZoom
         , id: 'mapbox.streets'
       , }).addTo(defenseMap);
@@ -248,6 +269,27 @@ angular.module('myApp')
         [mapInfo.NElat, mapInfo.NElng]
             , [mapInfo.SWlat, mapInfo.SWlng]
       ]);
+        
+        
+       //Search radius circle  
+        var searchRadius = gameInfo.precision * 1609.34; //Convert from miles to meters
+        
+        var filterCircle = L.circle(L.latLng(mapInfo.NElat, mapInfo.NElng), 0, {
+            opacity: 1,
+            weight: 1,
+            fillOpacity: 0.4
+        }).addTo(offenseMap);
+      
+      
+        offenseMap.on('mousemove', function (e) {
+            filterCircle.setRadius(searchRadius);
+            filterCircle.setLatLng(e.latlng);
+        }); 
+       
+        offenseMap.on('mouseout', function (e) {
+            filterCircle.setRadius(0);
+        });
+        
     }
 
   });

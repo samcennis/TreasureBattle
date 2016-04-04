@@ -7,7 +7,14 @@ angular.module('myApp')
     , joinName: ""
   }
   $scope.createData = gameData.getInfo();
-  
+   
+    
+  //Sets appropriate default precision based on 
+  $scope.changeMapSelection = function (map) {
+      map == "USA" ? $scope.createData.precision = 100 : $scope.createData.precision = 1;
+      
+  }
+    
   $http.get('/options')
         .success(function(data) {
             console.log(data)
