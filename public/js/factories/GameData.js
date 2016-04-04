@@ -12,8 +12,8 @@ angular.module('myApp')
       createName: ""
       , numberOfTokens: 3
       , numberOfPlayers: 2
-      , percision: 100
-      , map: ""
+      , precision: 100
+      , map: "USA"
   };
 
   service.setInfo = function (data) {
@@ -42,7 +42,7 @@ angular.module('myApp')
       createName: ""
       , numberOfTokens: 0
       , numberOfPlayers: 0
-      , percision: 0
+      , precision: 0
       , map: ""
     };
     return info;

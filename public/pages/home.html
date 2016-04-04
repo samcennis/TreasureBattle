@@ -3,11 +3,11 @@
   <div class="row">
 
     <div class="col-lg-12">
-      <h1 class="page-header">Game Menu</h1>
+      <h2 class="page-header">Game Menu</h2>
     </div>
 
   </div>
-  <h3>Join A Game</h3>
+  <h3>Join Existing Game</h3>
   <form name="joinForm" novalidate>
     <fieldset class="form-group">
       <label for="gameSelect">Existing Games</label>
@@ -18,7 +18,7 @@
     <button type="submit" class="btn btn-primary" ng-disabled="!joinForm.$valid" ng-click="joinGame()">Join</button>
   </form>
 
-  <h3>Create A Game</h3>
+  <h3>Create New Game</h3>
   <form name="createForm" novalidate>
     <fieldset class="form-group" ng-class="{'has-error': !createForm.gameName.$valid && createForm.gameName.$touched}">
       <label for="inputName">Game Name</label>
@@ -29,21 +29,20 @@
       <input name="players" ng-model="createData.numberOfPlayers" required type="number" class="form-control" id="numPlayers" placeholder="2" min="2" max="10">
     </fieldset>
     <fieldset class="form-group" ng-class="{'has-error': !createForm.tokens.$valid && createForm.tokens.$touched}">
-      <label for="numTokens">Numer of Tokens (1 to 10)</label>
+      <label for="numTokens">Number of Tokens (1 to 10)</label>
       <input name="tokens" ng-model="createData.numberOfTokens" required type="number" class="form-control" id="numTokens" placeholder="3" min="1" max="10">
     </fieldset>
     <fieldset class="form-group" ng-class="{'has-error': !createForm.map.$valid && createForm.map.$touched}">
       <label for="mapSelect">Map</label>
-      <select name="map" class="form-control" id="mapSelect" required ng-model="createData.map">
+      <select name="map" class="form-control" id="mapSelect" required ng-model="createData.map" ng-change="changeMapSelection(createData.map)">
         <option value="USA">USA</option>
         <option value="Ames">Ames</option>
       </select>
     </fieldset>
     <fieldset class="form-group" ng-class="{'has-error': !createForm.range.$valid && createForm.range.$touched}">
-      <label for="rangeSelect">Percision (miles)</label>
-      <input name="range" type="number" class="form-control" required id="rangeSelect" ng-model="createData.percision" min=".01" max="1000">
+      <label for="rangeSelect">Token Find Difficulty (Radius in miles)</label>
+      <input name="range" type="number" class="form-control" required id="rangeSelect" ng-model="createData.precision" min=".01" max="1000">
     </fieldset>
-    
     <button type="submit" class="btn btn-primary" ng-disabled="!createForm.$valid" ng-click="createGame()">Create</button>
   </form>
 </div>
