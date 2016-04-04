@@ -17,7 +17,7 @@ angular.module('myApp')
   };
 
   service.setInfo = function (data) {
-    isCreated = true;
+    created = true;
     info = data;
   }
   
