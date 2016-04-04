@@ -19,7 +19,7 @@
   </form>
 
   <h3>Create A Game</h3>
-  <form name="createForm" >
+  <form name="createForm" novalidate>
     <fieldset class="form-group" ng-class="{'has-error': !createForm.gameName.$valid && createForm.gameName.$touched}">
       <label for="inputName">Game Name</label>
       <input name="gameName" ng-model="createData.createName" required type="text" class="form-control" id="inputName" placeholder="Enter name">
