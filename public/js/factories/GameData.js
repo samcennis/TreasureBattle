@@ -38,11 +38,13 @@ angular.module('myApp')
   }
   
   service.resetInfo = function () {
+    created = false;
+    joinName = "";
     info = {
       createName: ""
-      , numberOfTokens: 0
-      , numberOfPlayers: 0
-      , precision: 0
+      , numberOfTokens: 3
+      , numberOfPlayers: 2
+      , precision: 100
       , map: ""
     };
     return info;

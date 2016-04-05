@@ -6,9 +6,19 @@ angular.module('myApp')
     options: {}
     , joinName: ""
   }
+  
+  gameData.resetInfo();
   $scope.createData = gameData.getInfo();
 
   var customMap = L.map('customMap').setView([38, -100], 4);
+  
+  $http.get('/options')
+        .success(function(data) {
+            $scope.joinData.options = data;
+        })
+        .error(function(data) {
+            console.log('Error getting joinable game options from server');
+        });
 
   //Sets appropriate default precision based on
   $scope.changeMapSelection = function (map) {
@@ -43,14 +53,16 @@ angular.module('myApp')
     $scope.vis = true;
   }
 
-  $http.get('/options')
+  $scope.getGameOptions = function(){
+    $http.get('/options')
         .success(function(data) {
-            console.log(data)
             $scope.joinData.options = data;
         })
         .error(function(data) {
-            console.log('GET Error');
+            console.log('Error getting joinable game options from server');
         });
+  }
+  
 
   $scope.joinGame = function () {
     gameData.setJoin($scope.joinData.joinName);

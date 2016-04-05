@@ -217,7 +217,7 @@ function guess(data) {
     });
   } else {
     //if win condition reached, remove game from list
-    delete games[data.game]
+    delete games[data.name];
     gameCount--;
   }
 }

@@ -41,6 +41,7 @@ angular.module('myApp')
         mapInfo = mapData.getAmes();
       } else {
         mapInfo = mapData.getCustom();
+        console.log(mapInfo);
       }
       gameName = gameInfo.createName;
 
@@ -122,12 +123,7 @@ angular.module('myApp')
       }
     });
 
-
-    document.getElementById("ready_btn").onclick = function () {
-      save()
-    };
-
-    function save() {
+    $scope.playerReady = function () {
       console.log("ready click");
       if (placedTokens < gameInfo.numberOfTokens) {
         alert('You need to place ' + gameInfo.numberOfTokens + ' Tokens on the bottom map!')
@@ -145,6 +141,11 @@ angular.module('myApp')
 
           $scope.ready = true;
       }
+    }
+    
+    $scope.playAgain = function () {
+      console.log("playing again");
+      $location.path( '/' );
     }
 
     // draw line received from server
