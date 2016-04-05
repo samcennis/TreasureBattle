@@ -37,8 +37,12 @@
       <select name="map" class="form-control" id="mapSelect" required ng-model="createData.map" ng-change="changeMapSelection(createData.map)">
         <option value="USA">USA</option>
         <option value="Ames">Ames</option>
+        <option value="Custom">Custom</option>
       </select>
     </fieldset>
+    <div id="mapCust">
+      <div id="customMap" ng-show="vis" style="height: 400px;"></div>
+    </div>
     <fieldset class="form-group" ng-class="{'has-error': !createForm.range.$valid && createForm.range.$touched}">
       <label for="rangeSelect">Token Find Difficulty (Radius in miles)</label>
       <input name="range" type="number" class="form-control" required id="rangeSelect" ng-model="createData.precision" min=".01" max="1000">

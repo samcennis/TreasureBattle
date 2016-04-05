@@ -28,7 +28,7 @@ angular.module('myApp')
     $scope.precision = 100;
 
     var turn = -1; //-1-set markers, otherwise matches playerId's turn
-    
+
     //if game wasn't created or joined go to game menu
     if(gameData.getJoinName() == "" && !gameData.isCreated()){
       $location.path( '/' );
@@ -37,8 +37,10 @@ angular.module('myApp')
       gameInfo = gameData.getInfo();
       if (gameInfo.map == "USA") {
         mapInfo = mapData.getUSA();
-      } else {
+      } else if (gameInfo.map == "Ames") {
         mapInfo = mapData.getAmes();
+      } else {
+        mapInfo = mapData.getCustom();
       }
       gameName = gameInfo.createName;
 
@@ -48,9 +50,9 @@ angular.module('myApp')
         , map: mapInfo
       });
 
-        
+
       $scope.precision = gameInfo.precision;
-        
+
       setupMap();
 
     } else {
@@ -101,7 +103,7 @@ angular.module('myApp')
         console.log("Can't place token! You are not a member of this game...");
       }
     });
-      
+
     offenseMap.on('click', function (e) {
       if (playerId < gameInfo.numberOfPlayers) {
         if (turn == playerId) {
@@ -119,7 +121,7 @@ angular.module('myApp')
         console.log("Can't place guess! You are not a member of this game...");
       }
     });
-      
+
 
     document.getElementById("ready_btn").onclick = function () {
       save()
@@ -140,7 +142,7 @@ angular.module('myApp')
           , coordinates: mycoordinates
           , name: gameName
         });
-          
+
           $scope.ready = true;
       }
     }
@@ -161,7 +163,7 @@ angular.module('myApp')
         console.log("playing");
         playerId = data.id;
         gameInfo.numberOfTokens = data.tokenNum;
-        gameInfo.numberOfPlayers = data.playerNum;       
+        gameInfo.numberOfPlayers = data.playerNum;
         gameInfo.precision = data.precision;
         $scope.precision = data.precision;
         mapInfo = data.map;
@@ -172,7 +174,7 @@ angular.module('myApp')
         $scope.gameFull = true;
         console.log("This game is already full!");
       }
-        
+
       $scope.$apply();
     });
 
@@ -188,7 +190,7 @@ angular.module('myApp')
         $scope.$apply();
       }
     });
-    
+
     socket.on('waiting', function (data) {
       if (data.name == gameName) {
         if(data.player == playerId){
@@ -211,21 +213,21 @@ angular.module('myApp')
               iconAnchor: [12, 40], // point of the icon which will correspond to marker's location
             })
           });
-        $.snackbar({content: "TOKEN FOUND!"});  
-            
+        $.snackbar({content: "TOKEN FOUND!"});
+
         } else {
           m = L.marker(data.latlng);
-          $.snackbar({content: "Miss..."});  
+          $.snackbar({content: "Miss..."});
         }
         m.bindPopup("<b>Closest Token:</b><br>" + Math.round(data.distance * 100) / 100 + " mi.")
         m.on('mouseover', function(e) {
-           this.openPopup(); 
+           this.openPopup();
         });
         m.on('mouseout', function(e) {
-           this.closePopup(); 
+           this.closePopup();
         });
-        
-        
+
+
         if (data.player == playerId) {
           m.addTo(offenseMap);
           if (data.game_status) {
@@ -244,14 +246,14 @@ angular.module('myApp')
         $scope.$apply();
       }
     });
-    
 
-     
-      
+
+
+
     function setupMap() {
-      
+
       console.log(mapInfo);
-      
+
       L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1Ijoic2VubmlzIiwiYSI6ImNpbTUwbmZ2ZjAxZzZ0a20zM3lpZzdtMWsifQ.4gt6lV5KwYEyzRXItJxHHQ', {
         maxZoom: mapInfo.maxZoom
         , minZoom: mapInfo.minZoom
@@ -273,27 +275,27 @@ angular.module('myApp')
         [mapInfo.NElat, mapInfo.NElng]
             , [mapInfo.SWlat, mapInfo.SWlng]
       ]);
-        
-        
-       //Search radius circle  
+
+
+       //Search radius circle
         var searchRadius = gameInfo.precision * 1609.34; //Convert from miles to meters
-        
+
         var filterCircle = L.circle(L.latLng(mapInfo.NElat, mapInfo.NElng), 0, {
             opacity: 1,
             weight: 1,
             fillOpacity: 0.4
         }).addTo(offenseMap);
-      
-      
+
+
         offenseMap.on('mousemove', function (e) {
             filterCircle.setRadius(searchRadius);
             filterCircle.setLatLng(e.latlng);
-        }); 
-       
+        });
+
         offenseMap.on('mouseout', function (e) {
             filterCircle.setRadius(0);
         });
-        
+
     }
 
   });
