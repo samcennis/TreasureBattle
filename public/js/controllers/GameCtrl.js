@@ -276,6 +276,9 @@ angular.module('myApp')
         [mapInfo.NElat, mapInfo.NElng]
             , [mapInfo.SWlat, mapInfo.SWlng]
       ]);
+      
+      offenseMap.setZoom(mapInfo.minZoom);
+      defenseMap.setZoom(mapInfo.minZoom);
 
 
        //Search radius circle
