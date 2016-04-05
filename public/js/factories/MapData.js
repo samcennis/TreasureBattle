@@ -17,8 +17,8 @@ angular.module('myApp')
       NElng : -66,
       SWlat : 26,
       SWlng : -124,
-      minzoom : 4,
-      maxzoom : 12
+      minZoom : 4,
+      maxZoom : 12
     };
   }
 
@@ -38,7 +38,7 @@ angular.module('myApp')
     nelng = data.getBounds().getNorthEast().lng;
     swlat = data.getBounds().getSouthWest().lat;
     swlng = data.getBounds().getSouthWest().lng;
-    minzoom = data.getZoom();
+    minZoom = data.getZoom();
   }
 
   service.getCustom = function () {
@@ -47,7 +47,7 @@ angular.module('myApp')
       NElng : nelng,
       SWlat : swlat,
       SWlng : swlng,
-      minZoom : minzoom,
+      minZoom : minZoom,
       maxZoom : 18
     };
   }
