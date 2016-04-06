@@ -30,6 +30,7 @@ angular.module('myApp')
     $scope.gameFull = false;
     $scope.ready = false;
     $scope.precision = 100;
+    $scope.leavingPlayer = -1;
 
     var turn = -1; //-1-set markers, otherwise matches playerId's turn
 
@@ -162,8 +163,10 @@ angular.module('myApp')
         } else {
           console.log("failed to create game");
           playerId = -1;
-          $location.path( '/' );
-          $.snackbar({content: "Failed to create game."});
+          $location.path('/');
+          $.snackbar({
+            content: "Failed to create game - " + data.reason
+          });
         }
       } else if (data.playing) {
         console.log("playing");
@@ -208,11 +211,14 @@ angular.module('myApp')
     });
 
     socket.on('player_left', function (data) {
-      $scope.won = 1;
-      $scope.$apply();
-      socket.emit('game_end', {
-        name: gameName
-      });
+      if (data.name == gameName) {
+        $scope.won = 3;
+        $scope.leavingPlayer = data.player;
+        $scope.$apply();
+        socket.emit('game_end', {
+          name: gameName
+        });
+      }
     });
 
     socket.on('guessed', function (data) {
@@ -338,12 +344,18 @@ angular.module('myApp')
 
 
 
+
+
+
         
         , [mapInfo.SWlat, mapInfo.SWlng]
       ]);
 
       defenseMap.setMaxBounds([
         [mapInfo.NElat, mapInfo.NElng]
+
+
+
 
 
 

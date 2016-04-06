@@ -55,6 +55,7 @@ function onSocketConnection(socket) {
   socket.on('disconnect', disconnect);
 
   socket.on('game_end', game_end);
+
 }
 
 function createGame(data) {
@@ -62,14 +63,15 @@ function createGame(data) {
 
   var isCreated = false;
   var nameTaken = false;
+  var reason = "";
 
-  for(name in games){
-    if(data.info.createName == name){
+  for (name in games) {
+    if (data.info.createName == name) {
       nameTaken = true;
       break;
     }
   }
-  
+
   if (gameCount <= gameLimit && !nameTaken) {
 
     var newGame = new Game(data.info.createName, data.info.numberOfPlayers, data.info.numberOfTokens, data.info.precision, data.map);
@@ -78,13 +80,21 @@ function createGame(data) {
 
     games[data.info.createName] = newGame;
 
+    this.gameName = data.info.createName;
+    this.player = 0;
+
     isCreated = true;
+  } else if (!nameTaken) {
+    reason = "game limit reached";
+    console.log(reason);
   } else {
-    console.log("Failed, reached game limit");
+    reason = "that name is taken";
+    console.log(reason);
   }
 
   this.emit('joinReq', {
     status: isCreated
+    , reason: reason
   });
 }
 
@@ -102,11 +112,16 @@ function joinRequest(data) {
       , precision: game.getPrecision()
       , map: game.getMap()
     });
+
+    this.gameName = data.name;
+    this.player = game.getCount();
+
     game.addPlayer(new Player(game.getCount()));
+
   } else {
     this.emit('joinReq', {
       playing: false
-    });
+    , });
   }
 }
 
@@ -150,14 +165,16 @@ function playerReady(data) {
   }
 }
 
-function disconnect(data){
+function disconnect(data) {
   console.log("player disconnected");
   this.broadcast.emit('player_left', {
-    info: "A player has disconnected"
+    name: this.gameName
+    , player: this.player
+    , info: "A player has disconnected"
   });
 }
 
-function game_end(data){
+function game_end(data) {
   delete games[data.name];
   gameCount--;
 }
