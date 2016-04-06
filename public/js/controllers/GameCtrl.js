@@ -162,6 +162,8 @@ angular.module('myApp')
         } else {
           console.log("failed to create game");
           playerId = -1;
+          $location.path( '/' );
+          $.snackbar({content: "Failed to create game."});
         }
       } else if (data.playing) {
         console.log("playing");
@@ -203,6 +205,14 @@ angular.module('myApp')
         $scope.status.waitingOn = data.num;
         $scope.$apply();
       }
+    });
+
+    socket.on('player_left', function (data) {
+      $scope.won = 1;
+      $scope.$apply();
+      socket.emit('game_end', {
+        name: gameName
+      });
     });
 
     socket.on('guessed', function (data) {

@@ -52,14 +52,25 @@ function onSocketConnection(socket) {
 
   socket.on('guess', guess);
 
+  socket.on('disconnect', disconnect);
+
+  socket.on('game_end', game_end);
 }
 
 function createGame(data) {
   console.log("create game " + data.info.createName);
 
   var isCreated = false;
+  var nameTaken = false;
 
-  if (gameCount <= gameLimit) {
+  for(name in games){
+    if(data.info.createName == name){
+      nameTaken = true;
+      break;
+    }
+  }
+  
+  if (gameCount <= gameLimit && !nameTaken) {
 
     var newGame = new Game(data.info.createName, data.info.numberOfPlayers, data.info.numberOfTokens, data.info.precision, data.map);
 
@@ -137,6 +148,18 @@ function playerReady(data) {
   } else {
     console.log("Invalid player with ID: " + data.id + " tried to click ready button");
   }
+}
+
+function disconnect(data){
+  console.log("player disconnected");
+  this.broadcast.emit('player_left', {
+    info: "A player has disconnected"
+  });
+}
+
+function game_end(data){
+  delete games[data.name];
+  gameCount--;
 }
 
 function guess(data) {
