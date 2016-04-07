@@ -1,4 +1,4 @@
-Intructions on how to run.
+Instructions on how to run.
 
 1) Download Node and npm
 
